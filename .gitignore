@@ -1,7 +1,7 @@
 ﻿.idea
 .cursor
 .DS_Store
-*.usersettings
+*.DotSettings.user
 bin
 obj
 out
