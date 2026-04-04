@@ -134,7 +134,7 @@ AgentFAI/
 
 - [Unity Mod Manager](https://github.com/newman55/unity-mod-manager) - Mod 加载框架
 - [Harmony](https://github.com/pardeike/Harmony) - 运行时补丁库
-- [Microsoft Agents](https://github.com/microsoft/agents) - AI 代理框架
+- [Microsoft Agent Framework](https://github.com/microsoft/agent-framework) - AI 代理框架
 - 《A Dance of Fire and Ice》开发团队 - 7th Beat Games
 
 ## 联系方式
