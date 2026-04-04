@@ -1,0 +1,7 @@
+﻿.idea
+.cursor
+.DS_Store
+*.usersettings
+bin
+obj
+out

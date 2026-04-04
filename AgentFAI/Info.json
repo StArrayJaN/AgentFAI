@@ -1,0 +1,12 @@
+{
+  "Id": "AgentFAI",
+  "DisplayName": "AgentFAI",
+  "Author": "StArray",
+  "Version": "1.0.0",
+  "ManagerVersion": "0.27.0",
+  "Requirements": [],
+  "AssemblyName": "AgentFAI.dll",
+  "EntryMethod": "AgentFAI.Main.Load",
+  "HomePage": "",
+  "Repository": ""
+}

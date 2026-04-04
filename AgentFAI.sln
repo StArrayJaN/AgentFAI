@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgentFAI", "AgentFAI\AgentFAI.csproj", "{13067DD1-B914-4852-B7B9-7B28935D7BDB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13067DD1-B914-4852-B7B9-7B28935D7BDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13067DD1-B914-4852-B7B9-7B28935D7BDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13067DD1-B914-4852-B7B9-7B28935D7BDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13067DD1-B914-4852-B7B9-7B28935D7BDB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
