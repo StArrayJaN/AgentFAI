@@ -16,6 +16,7 @@
 
 ### 📦 资源管理
 - **资源加载器** - 支持从 Resources 目录加载文本和其他资源文件
+- **AssetBundle 支持** - 自动从 Unity 项目复制 AssetBundle 文件
 - **模块化设计** - 易于扩展和维护的代码结构
 
 ## 技术栈
@@ -62,18 +63,29 @@ dotnet build AgentFAI/AgentFAI.csproj -c Debug
 dotnet build AgentFAI/AgentFAI.csproj -c Release
 ```
 
+构建完成后，所有文件会自动复制到 `out/` 目录，包括：
+- 合并后的 `AgentFAI.dll`（包含所有 NuGet 依赖）
+- `Info.json` Mod 配置文件
+- `Resources/` 目录下的资源文件
+- `lib/` 目录下的额外 DLL
+- Unity AssetBundle 文件（如果存在）
+
 ### 配置游戏路径
 
-在项目文件中修改 `GameExePath` 属性：
+在 `AgentFAI.csproj` 文件中修改 `GameExePath` 属性：
 
 ```xml
 <PropertyGroup>
     <GameExePath>D:\Your\Game\Path\A Dance of Fire and Ice.exe</GameExePath>
-    <AutoLaunchGame>true</AutoLaunchGame>
+    <AutoLaunchGame>false</AutoLaunchGame>
 </PropertyGroup>
 ```
 
-构建完成后，Mod 会自动部署到游戏目录并可选择性地启动游戏。
+**配置说明：**
+- `GameExePath`: 游戏可执行文件的完整路径
+- `AutoLaunchGame`: 设置为 `true` 时，构建完成后自动启动游戏
+
+构建完成后，Mod 会自动部署到游戏的 `Mods/AgentFAI/` 目录。
 
 ### 项目结构
 
@@ -97,6 +109,33 @@ AgentFAI/
 - **主 DLL**: `AgentFAI.dll` (包含所有依赖)
 - **排除项**: 游戏本身的程序集（如 UnityEngine、Assembly-CSharp 等）不会被合并
 - **自动执行**: 每次构建后自动执行 ILRepack
+- **原始备份**: 生成 `AgentFAI.original.dll` 用于调试
+
+### MSBuild 任务流程
+
+项目使用自定义的 MSBuild Targets 文件 (`UserTasks.targets`) 管理构建流程：
+
+```
+Build → ILRepack → CopyToOut → DeployAndLaunch
+```
+
+**各阶段说明：**
+1. **Build**: 编译 C# 代码
+2. **ILRepack**: 合并所有 NuGet 依赖到单个 DLL
+3. **CopyToOut**: 复制所有文件到 `out/` 目录
+   - 主 DLL 和 Info.json
+   - Resources 目录内容
+   - lib 目录的 DLL 文件
+   - Unity AssetBundle 文件（来自 `AgentFAI.UI/ThunderKit/AssetBundleStaging/`）
+4. **DeployAndLaunch**: 部署到游戏 Mods 目录并可选启动游戏
+
+### Unity 项目集成
+
+项目包含一个 Unity 子项目 (`AgentFAI.UI/`) 用于开发 UI 和 AssetBundles：
+
+- **DLL 同步**: 构建后自动将 `AgentFAI.dll` 复制到 Unity 项目的 `Assets/Plugins/AgentFAI/`
+- **AssetBundle 导出**: Unity 构建的 AssetBundles 放置在 `ThunderKit/AssetBundleStaging/`
+- **自动复制**: 构建 Mod 时自动将 AssetBundles 复制到 `out/Resources/`
 
 ## 使用方法
 
@@ -144,4 +183,5 @@ AgentFAI/
 
 ---
 
-**注意**: 此 Mod 仍在积极开发中，某些功能可能不完整或发生变化。
+**注意**: 此 Mod 仍在积极开发中，某些功能可能不完整或发生变化。  
+**文档由Qwen AI生成**
