@@ -109,8 +109,8 @@
         <Message Text="AssetBundles copied to: $(OutDir)Resources\" Importance="high" Condition="'@(AssetBundleFiles)' != ''" />
     </Target>
 
-    <!-- Deploy and launch game / 部署并启动游戏 -->
-    <Target Name="DeployAndLaunch" AfterTargets="CopyAssetBundles" Condition="'$(GameExePath)' != '' AND Exists('$(GameExePath)')">
+    <!-- Deploy mod files to game directory / 部署 Mod 文件到游戏目录 -->
+    <Target Name="Deploy" AfterTargets="CopyToOut">
         <PropertyGroup>
             <ModsDir>$(GameDir)$(PathSeparator)Mods$(PathSeparator)$(AssemblyName)$(PathSeparator)</ModsDir>
         </PropertyGroup>
@@ -128,6 +128,10 @@
         <Copy SourceFiles="@(ModFiles)" DestinationFolder="$(ModsDir)" SkipUnchangedFiles="true"/>
         <Copy SourceFiles="@(ModResourceFiles)" DestinationFolder="$(ModsDir)Resources\%(RecursiveDir)" SkipUnchangedFiles="true"/>
         <Message Text="Mod deployed to game directory: $(ModsDir)" Importance="high"/>
+    </Target>
+
+    <!-- Deploy and launch game / 部署并启动游戏 -->
+    <Target Name="DeployAndLaunch" AfterTargets="CopyAssetBundles" DependsOnTargets="Deploy" Condition="'$(GameExePath)' != '' AND Exists('$(GameExePath)')">
 
         <!-- Windows 启动命令 / Windows launch command -->
         <Exec Command="start &quot;&quot; &quot;$(GameExePath)&quot;"

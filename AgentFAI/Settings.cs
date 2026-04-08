@@ -1,6 +1,7 @@
 using System;
 using System.ClientModel;
 using System.Threading.Tasks;
+using AgentFAI.Tools;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using OpenAI;
@@ -24,6 +25,7 @@ namespace AgentFAI
 
         private string message;
         private AIAgent? agent;
+        private AgentSession session;
         /// <summary>
         /// Draw mod GUI / 绘制 Mod GUI
         /// </summary>
@@ -31,10 +33,10 @@ namespace AgentFAI
         {
             // Example: Draw settings UI / 示例：绘制设置界面
             GUILayout.Label("模型设置");
-            GUILayout.BeginHorizontal();
+            /*GUILayout.BeginHorizontal();
             GUILayout.Label("API密钥:");
             API_KEY = GUILayout.TextField(API_KEY);
-            GUILayout.EndHorizontal();
+            GUILayout.EndHorizontal();*/
             GUILayout.BeginHorizontal();
             GUILayout.Label("API地址:");
             API_URL = GUILayout.TextField(API_URL);
@@ -55,8 +57,9 @@ namespace AgentFAI
                             Endpoint = new Uri(API_URL)
                         });
                     agent = client.GetChatClient(Model)
-                        .AsAIAgent(instructions: "你在C#搭建的Microsoft.Agents.AI环境中，接下来请回复用户问题",
-                            tools: [AIFunctionFactory.Create(GameTools.GetSystemInfo)]);
+                        .AsAIAgent(name:nameof(AgentFAI),
+                            instructions: "你在C#搭建的Microsoft.Agents.AI环境中，接下来请回复用户问题,如执行任意关卡编辑相关工具，请先进入关卡编辑器",
+                            tools: [AIFunctionFactory.Create(LevelEditingTools.LoadLevel),AIFunctionFactory.Create(GameTools.EnterLevelEditor)]);
                 }
                 SendMessage(message);
                 message = "";
@@ -65,7 +68,8 @@ namespace AgentFAI
 
         public async Task SendMessage(string message)
         {
-            var response = await agent.RunAsync(message);
+            if (session == null) session = await agent.CreateSessionAsync(); 
+            var response = await agent.RunAsync(message,session);
             Main.Mod.Logger.Log(response.Text);
         }
 
