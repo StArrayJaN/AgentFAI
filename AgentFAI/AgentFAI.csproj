@@ -26,7 +26,7 @@
 
     <PropertyGroup>
         <GameExePath>D:\Softwares\Steam\steamapps\common\A Dance of Fire and Ice\A Dance of Fire and Ice.exe</GameExePath>
-        <AutoLaunchGame>true</AutoLaunchGame>
+        <AutoLaunchGame>false</AutoLaunchGame>
     </PropertyGroup>
 
     <!-- 根据 GameExePath 计算托管程序集路径 / Calculate managed assemblies path from GameExePath -->
@@ -329,129 +329,8 @@
       <Folder Include="lib\" />
     </ItemGroup>
 
-    <!-- ILRepack 合并依赖项 / ILRepack merge dependencies -->
-    <Target Name="ILRepack" AfterTargets="Build">
-        <PropertyGroup>
-            <ILRepackExe>$(NuGetPackageRoot)ilrepack.msbuild.task\2.0.13\tools\ILRepack.exe</ILRepackExe>
-            <MergedDll>$([System.IO.Path]::GetFullPath('$(OutputPath)$(AssemblyName).dll'))</MergedDll>
-            <OriginalDll>$(OutputPath)$(AssemblyName).original.dll</OriginalDll>
-        </PropertyGroup>
 
-        <!-- 重命名原始输出 DLL / Rename original output DLL -->
-        <Move SourceFiles="$(MergedDll)" DestinationFiles="$(OriginalDll)" Condition="Exists('$(MergedDll)')" />
 
-        <!-- 收集需要合并的依赖项 / Collect dependencies to merge -->
-        <ItemGroup>
-            <!-- 只合并项目引用的 NuGet 包依赖，不合并游戏引用 -->
-            <LibsToMerge Include="$(OriginalDll)" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Agents.AI.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Agents.AI.Abstractions.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Agents.AI.OpenAI.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.AI.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.AI.Abstractions.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.AI.OpenAI.dll" />
-            <LibsToMerge Include="$(OutputPath)OpenAI.dll" />
-            <LibsToMerge Include="$(OutputPath)Google.Protobuf.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.ML.Tokenizers.dll" />
-            <LibsToMerge Include="$(OutputPath)System.ClientModel.dll" />
-            <LibsToMerge Include="$(OutputPath)System.Memory.Data.dll" />
-            <LibsToMerge Include="$(OutputPath)System.Net.ServerSentEvents.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.Caching.Abstractions.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.Compliance.Abstractions.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.VectorData.Abstractions.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.Logging.Abstractions.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.Options.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.Primitives.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.Configuration.Abstractions.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.FileProviders.Abstractions.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.Hosting.Abstractions.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.Diagnostics.Abstractions.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Extensions.ObjectPool.dll" />
-            <LibsToMerge Include="$(OutputPath)System.Buffers.dll" />
-            <LibsToMerge Include="$(OutputPath)System.Memory.dll" />
-            <LibsToMerge Include="$(OutputPath)System.Numerics.Vectors.dll" />
-            <LibsToMerge Include="$(OutputPath)System.Runtime.CompilerServices.Unsafe.dll" />
-            <LibsToMerge Include="$(OutputPath)System.Text.Encodings.Web.dll" />
-            <LibsToMerge Include="$(OutputPath)System.Text.Json.dll" />
-            <LibsToMerge Include="$(OutputPath)System.Threading.Channels.dll" />
-            <LibsToMerge Include="$(OutputPath)System.Threading.Tasks.Extensions.dll" />
-            <LibsToMerge Include="$(OutputPath)System.IO.Pipelines.dll" />
-            <LibsToMerge Include="$(OutputPath)System.Diagnostics.DiagnosticSource.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Bcl.AsyncInterfaces.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Bcl.HashCode.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Bcl.Memory.dll" />
-            <LibsToMerge Include="$(OutputPath)Microsoft.Bcl.Numerics.dll" />
-            <LibsToMerge Include="$(OutputPath)Newtonsoft.Json.dll" />
-        </ItemGroup>
-
-        <!-- 过滤存在的文件 / Filter existing files -->
-        <ItemGroup>
-            <ExistingLibs Include="@(LibsToMerge)" Condition="Exists('%(FullPath)')" />
-        </ItemGroup>
-
-        <!-- 执行 ILRepack 合并 / Execute ILRepack merge -->
-        <Exec Command="&quot;$(ILRepackExe)&quot; /out:&quot;$(MergedDll)&quot; /target:library /union @(ExistingLibs->'&quot;%(FullPath)&quot;', ' ')"
-              WorkingDirectory="$(OutputPath)"
-              Condition="Exists('$(ILRepackExe)') And '@(ExistingLibs)' != ''" 
-              IgnoreExitCode="false" />
-
-        <!-- 删除已合并的依赖（保留 original 用于调试）/ Delete merged dependencies (keep original for debugging) -->
-        <Delete Files="@(ExistingLibs)" Condition="Exists('$(MergedDll)') And '%(Filename)%(Extension)' != '$(AssemblyName).original.dll'" />
-
-        <Message Text="ILRepack completed successfully: $(MergedDll)" Importance="high" Condition="Exists('$(MergedDll)')" />
-        <Warning Text="ILRepack failed or was skipped. Check the build output for details." Condition="!Exists('$(MergedDll)') And Exists('$(OriginalDll)')" />
-    </Target>
-
-    <Target Name="CopyToOut" AfterTargets="ILRepack">
-        <PropertyGroup>
-            <OutDir>$(ProjectDir)out\</OutDir>
-        </PropertyGroup>
-        <MakeDir Directories="$(OutDir)"/>
-        <MakeDir Directories="$(OutDir)Resources"/>
-        <ItemGroup>
-            <FilesToCopy Include="$(OutputPath)$(AssemblyName).dll"/>
-            <FilesToCopy Include="$(ProjectDir)Info.json"/>
-            <ResourceFiles Include="$(ProjectDir)Resources\**\*" Exclude="$(ProjectDir)Resources\**\*\"/>
-            <LibDllFiles Include="$(ProjectDir)lib\**\*.dll" />
-        </ItemGroup>
-        <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"/>
-        <Copy SourceFiles="@(ResourceFiles)" DestinationFolder="$(OutDir)Resources\%(RecursiveDir)" SkipUnchangedFiles="true"/>
-        <Copy SourceFiles="@(LibDllFiles)" DestinationFolder="$(OutDir)%(RecursiveDir)" SkipUnchangedFiles="true"/>
-        <Message Text="Files copied to out folder: $(OutDir)" Importance="high"/>
-    </Target>
-
-    <Target Name="DeployAndLaunch" AfterTargets="CopyToOut" Condition="'$(GameExePath)' != '' AND Exists('$(GameExePath)')">
-        <PropertyGroup>
-            <ModsDir>$(GameDir)$(PathSeparator)Mods$(PathSeparator)$(AssemblyName)$(PathSeparator)</ModsDir>
-        </PropertyGroup>
-
-        <Message Text="Game Directory: $(GameDir)" Importance="high"/>
-        <Message Text="Managed Assemblies Path: $(ManagedAssembliesDir)" Importance="high"/>
-        <Message Text="Platform: $(OS)" Importance="high"/>
-
-        <MakeDir Directories="$(ModsDir)"/>
-        <MakeDir Directories="$(ModsDir)Resources"/>
-        <ItemGroup>
-            <ModFiles Include="$(ProjectDir)out\*.*" Exclude="$(ProjectDir)out\Resources\**\*"/>
-            <ModResourceFiles Include="$(ProjectDir)out\Resources\**\*" Exclude="$(ProjectDir)out\Resources\**\*\"/>
-        </ItemGroup>
-        <Copy SourceFiles="@(ModFiles)" DestinationFolder="$(ModsDir)" SkipUnchangedFiles="true"/>
-        <Copy SourceFiles="@(ModResourceFiles)" DestinationFolder="$(ModsDir)Resources\%(RecursiveDir)" SkipUnchangedFiles="true"/>
-        <Message Text="Mod deployed to game directory: $(ModsDir)" Importance="high"/>
-
-        <!-- Windows 启动命令 / Windows launch command -->
-        <Exec Command="start &quot;&quot; &quot;$(GameExePath)&quot;"
-              IgnoreExitCode="true"
-              Condition="'$(AutoLaunchGame)' == 'true' AND '$(IsWindows)' == 'true'"/>
-
-        <!-- Linux/Unix 启动命令 / Linux/Unix launch command -->
-        <Exec Command="chmod +x &quot;$(GameExePath)&quot; &amp;&amp; nohup &quot;$(GameExePath)&quot; &gt; /dev/null 2&gt;&amp;1 &amp;"
-              IgnoreExitCode="true"
-              Condition="'$(AutoLaunchGame)' == 'true' AND '$(IsUnix)' == 'true'"/>
-
-        <Message Text="Game launched: $(GameExePath)" Importance="high" Condition="'$(AutoLaunchGame)' == 'true'"/>
-        <Message Text="Auto-launch disabled. Game not started." Importance="high" Condition="'$(AutoLaunchGame)' != 'true'"/>
-    </Target>
-
+    <!-- Import user-defined tasks / 导入用户自定义任务 -->
+    <Import Project="UserTasks.targets" Condition="Exists('UserTasks.targets')" />
 </Project>

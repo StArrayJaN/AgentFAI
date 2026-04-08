@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace AgentFAI;
 
@@ -10,7 +11,7 @@ public class GameTools
     [Description("进入关卡编辑器")]
     public static void EnterEditor()
     {
-        ADOBase.LoadScene("scenes/scnEditor");
+        var load = SceneManager.LoadSceneAsync("scenes/scnEditor");
     }
 
     public static bool IsLevelEditor() => ADOBase.isLevelEditor;
