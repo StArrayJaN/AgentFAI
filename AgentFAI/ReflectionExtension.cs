@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 
@@ -88,6 +89,21 @@ public static class ReflectionExtension
         public ref T StaticFieldReference<T>(string fieldName)
         {
             return ref AccessTools.StaticFieldRefAccess<T>(o.GetType(), fieldName);
+        }
+        
+        public static MethodInfo[] GetMethodsWithAttributes<T>(Type type) where T : Attribute
+        {
+            return type
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance |BindingFlags.Static | BindingFlags.NonPublic)
+                .Where(m => m.GetCustomAttributes<T>().Any())
+                .ToArray();
+        }
+        public MethodInfo[] GetMethodsWithAttributes<T>() where T : Attribute
+        {
+            return o.GetType()
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance |BindingFlags.Static | BindingFlags.NonPublic)
+                .Where(m => m.GetCustomAttributes<T>().Any())
+                .ToArray();
         }
     }
 }
