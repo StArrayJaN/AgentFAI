@@ -4,8 +4,9 @@ using System.ComponentModel;
 using System.Linq;
 using ADOFAI;
 using UnityEngine;
+using AgentFAI.Extensions;
 
-namespace AgentFAI
+namespace AgentFAI.Tools
 {
     /// <summary>
     /// 关卡编辑工具方法集合
@@ -17,8 +18,8 @@ namespace AgentFAI
 
         [AgentTool("在指定位置创建新地板")]
         public static bool CreateFloor(
-            [AgentToolParameter("插入位置的地板索引")] int position,
-            [AgentToolParameter("地板角度(度)，0=右，90=上，180=左，270=下")] float angle)
+            [Description("插入位置的地板索引")] int position,
+            [Description("地板角度(度)，0=右，90=上，180=左，270=下")] float angle)
         {
             try
             {
@@ -61,7 +62,7 @@ namespace AgentFAI
 
         [AgentTool("删除指定位置的地板")]
         public static bool DeleteFloor(
-            [AgentToolParameter("要删除的地板索引")] int floorIndex)
+            [Description("要删除的地板索引")] int floorIndex)
         {
             try
             {
@@ -101,8 +102,8 @@ namespace AgentFAI
 
         [AgentTool("修改地板的角度")]
         public static bool ModifyFloorAngle(
-            [AgentToolParameter("地板索引")] int floorIndex,
-            [AgentToolParameter("新的角度(度)")] float newAngle)
+            [Description("地板索引")] int floorIndex,
+            [Description("新的角度(度)")] float newAngle)
         {
             try
             {
@@ -162,7 +163,7 @@ namespace AgentFAI
 
         [AgentTool("获取指定地板的角度")]
         public static float GetFloorAngle(
-            [AgentToolParameter("地板索引")] int floorIndex)
+            [Description("地板索引")] int floorIndex)
         {
             try
             {
@@ -207,8 +208,8 @@ namespace AgentFAI
 
         [AgentTool("为关卡添加事件，返回true为添加成功")]
         public static bool AddEvent(
-            [AgentToolParameter("要添加事件的地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType)
+            [Description("要添加事件的地板索引")] int floor,
+            [Description("事件类型名称")] string eventType)
         {
             try
             {
@@ -243,9 +244,9 @@ namespace AgentFAI
 
         [AgentTool("为关卡添加事件并设置属性")]
         public static bool AddEventWithProperties(
-            [AgentToolParameter("要添加事件的地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType,
-            [AgentToolParameter("事件属性字典")] Dictionary<string, object> properties)
+            [Description("要添加事件的地板索引")] int floor,
+            [Description("事件类型名称")] string eventType,
+            [Description("事件属性字典")] Dictionary<string, object> properties)
         {
             try
             {
@@ -298,10 +299,10 @@ namespace AgentFAI
 
         [AgentTool("为关卡添加事件并设置单个属性")]
         public static bool AddEventWithProperty(
-            [AgentToolParameter("要添加事件的地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType,
-            [AgentToolParameter("属性名称")] string propertyName,
-            [AgentToolParameter("属性值")] object propertyValue)
+            [Description("要添加事件的地板索引")] int floor,
+            [Description("事件类型名称")] string eventType,
+            [Description("属性名称")] string propertyName,
+            [Description("属性值")] object propertyValue)
         {
             var properties = new Dictionary<string, object> { { propertyName, propertyValue } };
             return AddEventWithProperties(floor, eventType, properties);
@@ -309,9 +310,9 @@ namespace AgentFAI
 
         [AgentTool("删除指定地板上的事件")]
         public static bool RemoveEvent(
-            [AgentToolParameter("地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType,
-            [AgentToolParameter("事件索引(同类型事件中的第几个，从0开始)")] int eventIndex = 0)
+            [Description("地板索引")] int floor,
+            [Description("事件类型名称")] string eventType,
+            [Description("事件索引(同类型事件中的第几个，从0开始)")] int eventIndex = 0)
         {
             try
             {
@@ -352,10 +353,10 @@ namespace AgentFAI
 
         [AgentTool("删除指定地板上匹配属性条件的事件")]
         public static int RemoveEventsByProperty(
-            [AgentToolParameter("地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType,
-            [AgentToolParameter("属性名称")] string propertyName,
-            [AgentToolParameter("属性值")] object propertyValue)
+            [Description("地板索引")] int floor,
+            [Description("事件类型名称")] string eventType,
+            [Description("属性名称")] string propertyName,
+            [Description("属性值")] object propertyValue)
         {
             try
             {
@@ -401,9 +402,9 @@ namespace AgentFAI
 
         [AgentTool("删除指定地板上匹配多个属性条件的事件")]
         public static int RemoveEventsByProperties(
-            [AgentToolParameter("地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType,
-            [AgentToolParameter("属性条件字典")] Dictionary<string, object> propertyConditions)
+            [Description("地板索引")] int floor,
+            [Description("事件类型名称")] string eventType,
+            [Description("属性条件字典")] Dictionary<string, object> propertyConditions)
         {
             try
             {
@@ -449,8 +450,8 @@ namespace AgentFAI
 
         [AgentTool("删除指定地板上指定类型的所有事件")]
         public static int RemoveAllEvents(
-            [AgentToolParameter("地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType)
+            [Description("地板索引")] int floor,
+            [Description("事件类型名称")] string eventType)
         {
             try
             {
@@ -494,11 +495,11 @@ namespace AgentFAI
 
         [AgentTool("修改事件的属性值")]
         public static bool SetEventProperty(
-            [AgentToolParameter("地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType,
-            [AgentToolParameter("属性名称")] string propertyName,
-            [AgentToolParameter("属性值")] object value,
-            [AgentToolParameter("事件索引(同类型事件中的第几个，从0开始)")] int eventIndex = 0)
+            [Description("地板索引")] int floor,
+            [Description("事件类型名称")] string eventType,
+            [Description("属性名称")] string propertyName,
+            [Description("属性值")] object value,
+            [Description("事件索引(同类型事件中的第几个，从0开始)")] int eventIndex = 0)
         {
             try
             {
@@ -548,10 +549,10 @@ namespace AgentFAI
 
         [AgentTool("批量修改同类型事件的属性值")]
         public static int SetAllEventProperties(
-            [AgentToolParameter("地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType,
-            [AgentToolParameter("属性名称")] string propertyName,
-            [AgentToolParameter("属性值")] object value)
+            [Description("地板索引")] int floor,
+            [Description("事件类型名称")] string eventType,
+            [Description("属性名称")] string propertyName,
+            [Description("属性值")] object value)
         {
             try
             {
@@ -605,10 +606,10 @@ namespace AgentFAI
 
         [AgentTool("获取事件的属性值")]
         public static object GetEventProperty(
-            [AgentToolParameter("地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType,
-            [AgentToolParameter("属性名称")] string propertyName,
-            [AgentToolParameter("事件索引(同类型事件中的第几个，从0开始)")] int eventIndex = 0)
+            [Description("地板索引")] int floor,
+            [Description("事件类型名称")] string eventType,
+            [Description("属性名称")] string propertyName,
+            [Description("事件索引(同类型事件中的第几个，从0开始)")] int eventIndex = 0)
         {
             try
             {
@@ -641,8 +642,8 @@ namespace AgentFAI
 
         [AgentTool("获取指定类型事件的数量")]
         public static int GetEventCount(
-            [AgentToolParameter("地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType)
+            [Description("地板索引")] int floor,
+            [Description("事件类型名称")] string eventType)
         {
             try
             {
@@ -666,7 +667,7 @@ namespace AgentFAI
 
         [AgentTool("获取指定地板上的所有事件")]
         public static string[] GetEventsOnFloor(
-            [AgentToolParameter("地板索引")] int floor)
+            [Description("地板索引")] int floor)
         {
             try
             {
@@ -689,7 +690,7 @@ namespace AgentFAI
 
         [AgentTool("获取指定地板上的事件详细信息")]
         public static EventInfo[] GetEventDetailsOnFloor(
-            [AgentToolParameter("地板索引")] int floor)
+            [Description("地板索引")] int floor)
         {
             try
             {
@@ -718,8 +719,8 @@ namespace AgentFAI
 
         [AgentTool("获取指定地板上指定类型事件的所有属性")]
         public static Dictionary<string, object>[] GetAllEventProperties(
-            [AgentToolParameter("地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType)
+            [Description("地板索引")] int floor,
+            [Description("事件类型名称")] string eventType)
         {
             try
             {
@@ -751,10 +752,10 @@ namespace AgentFAI
 
         [AgentTool("查找匹配属性条件的事件")]
         public static EventInfo[] FindEventsByProperty(
-            [AgentToolParameter("地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType,
-            [AgentToolParameter("属性名称")] string propertyName,
-            [AgentToolParameter("属性值")] object propertyValue)
+            [Description("地板索引")] int floor,
+            [Description("事件类型名称")] string eventType,
+            [Description("属性名称")] string propertyName,
+            [Description("属性值")] object propertyValue)
         {
             try
             {
@@ -789,9 +790,9 @@ namespace AgentFAI
 
         [AgentTool("查找匹配多个属性条件的事件")]
         public static EventInfo[] FindEventsByProperties(
-            [AgentToolParameter("地板索引")] int floor,
-            [AgentToolParameter("事件类型名称")] string eventType,
-            [AgentToolParameter("属性条件字典")] Dictionary<string, object> propertyConditions)
+            [Description("地板索引")] int floor,
+            [Description("事件类型名称")] string eventType,
+            [Description("属性条件字典")] Dictionary<string, object> propertyConditions)
         {
             try
             {
@@ -830,10 +831,10 @@ namespace AgentFAI
 
         [AgentTool("设置关卡基本信息")]
         public static bool SetLevelInfo(
-            [AgentToolParameter("艺术家名称")] string artist,
-            [AgentToolParameter("歌曲名称")] string song,
-            [AgentToolParameter("作者名称")] string author,
-            [AgentToolParameter("BPM值")] float bpm)
+            [Description("艺术家名称")] string artist,
+            [Description("歌曲名称")] string song,
+            [Description("作者名称")] string author,
+            [Description("BPM值")] float bpm)
         {
             try
             {
@@ -883,7 +884,7 @@ namespace AgentFAI
 
         [AgentTool("保存当前关卡")]
         public static bool SaveLevel(
-            [AgentToolParameter("保存路径")] string filePath)
+            [Description("保存路径")] string filePath)
         {
             try
             {
@@ -904,7 +905,7 @@ namespace AgentFAI
 
         [AgentTool("加载关卡文件")]
         public static bool LoadLevel(
-            [AgentToolParameter("关卡文件路径")] string filePath)
+            [Description("关卡文件路径")] string filePath)
         {
             try
             {

@@ -322,6 +322,7 @@
       </PackageReference>
       <PackageReference Include="Microsoft.Agents.AI" Version="1.0.0" />
       <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.0.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
       <PackageReference Include="System.ValueTuple" Version="4.6.2" />
     </ItemGroup>
 

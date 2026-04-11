@@ -1,14 +1,16 @@
 using System;
 using System.ClientModel;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
+using AgentFAI.Extensions;
 using AgentFAI.Tools;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using OpenAI.Chat;
+using SFB;
 using UnityModManagerNet;
 using UnityEngine;
 
@@ -27,8 +29,7 @@ namespace AgentFAI
         public string Model = "";
 
         private string message;
-        private AIAgent? agent;
-        private AgentSession session;
+        private AgentManager? agentManager;
         /// <summary>
         /// Draw mod GUI / 绘制 Mod GUI
         /// </summary>
@@ -52,13 +53,8 @@ namespace AgentFAI
             message = GUILayout.TextField(message);
             if (GUILayout.Button("发送"))
             {
-                if (agent == null)
+                if (agentManager == null)
                 {
-                    var client = new OpenAIClient(new ApiKeyCredential(API_KEY),
-                        new OpenAIClientOptions()
-                        {
-                            Endpoint = new Uri(API_URL)
-                        });
                     List<AITool> aiFunctions = new ();
                     var methodInfos = object.GetMethodsWithAttributes<AgentTool>(typeof(LevelEditingTools));
                     foreach (var methodInfo in methodInfos)
@@ -66,22 +62,39 @@ namespace AgentFAI
                         Main.Mod.Logger.Log($"添加工具:{methodInfo.Name}");
                         aiFunctions.Add(AIFunctionFactory.Create(methodInfo,target:null));
                     }
-                    aiFunctions.AddRange(object.GetMethodsWithAttributes<AgentTool>(typeof(GameTools)).Select(a => AIFunctionFactory.Create(a,target:null)));
-                    agent = client.GetChatClient(Model)
-                        .AsAIAgent(name:nameof(AgentFAI),
-                            instructions: "你在C#搭建的Microsoft.Agents.AI环境中，接下来请回复用户问题,如执行任意关卡编辑相关工具，请先进入关卡编辑器",
-                            tools: aiFunctions);
+                    methodInfos = object.GetMethodsWithAttributes<AgentTool>(typeof(GameTools));
+                    foreach (var methodInfo in methodInfos)
+                    {
+                        Main.Mod.Logger.Log($"添加工具:{methodInfo.Name}");
+                        aiFunctions.Add(AIFunctionFactory.Create(methodInfo,target:null));
+                    }
+                    agentManager = new(API_KEY,
+                        API_URL,
+                        Model,
+                        "你在C#搭建的Microsoft.Agents.AI环境中，接下来请回复用户问题,如执行任意关卡编辑相关工具，请先进入关卡编辑器",
+                        functions:aiFunctions);
                 }
                 SendMessage(message);
                 message = "";
+            }
+
+            if (GUILayout.Button("保存会话") && agentManager != null)
+            {
+                var distFolder = StandaloneFileBrowser.OpenFolderPanel("选择目录", "", false);
+                var folder = distFolder?.Length > 0 ? distFolder[0] : null;
+                if (folder != null)
+                {
+                    var fileName = "session_" + DateTime.Now.ToString("yyyy-MM-dd-HH_mm_ss") + ".txt";
+                    var path = Path.Combine(folder, fileName);
+                    agentManager.ExportSession(path);
+                    Main.Mod.Logger.Log($"已保存会话到:{path}");
+                }
             }
         }
 
         public async Task SendMessage(string message)
         {
-            
-            if (session == null) session = await agent.CreateSessionAsync(); 
-            var response = await agent.RunAsync(message,session);
+            var response = await agentManager.SendMessageAsync(message);
             Main.Mod.Logger.Log(response.Text);
         }
 
